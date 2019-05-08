@@ -1,7 +1,7 @@
 // =========== URI of MongoDB ===========
 
 const dbUsername = 'admin123';
-const dbPassword = 'Admin123';
+const dbPassword = 'admin123';
 
 const uri = `mongodb://${dbUsername}:${dbPassword}`
   + `@ds223756.mlab.com:23756/spense`;

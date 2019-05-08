@@ -4,7 +4,7 @@ const mongo = require('../constant/Connection')
 const schm = mongoose.Schema;
 
 const schmRole = new schm({
-        _id: {
+        Id: {
             type: Number,
             required: true,
             unique: true,
@@ -29,5 +29,15 @@ exports.Model = account;
 
 exports.toString = () => 'Role'
 
-exports.USER = 0
-exports.ADMIN = 1
+exports.USER = {
+    Id: 1,
+    name: 'user',
+}
+
+exports.USER_INDEX = 1;
+exports.ADMIN_INDEX = 2;
+
+exports.ADMIN = {
+    Id: 2,
+    name: 'admin'
+}

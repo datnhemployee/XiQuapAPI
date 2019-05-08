@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const mongo = require('../constant/Connection')
-const User_Role = require('../model/Role').USER;
+const USER_INDEX = require('../model/Role').USER_INDEX;
 
 const schm = mongoose.Schema;
 
@@ -19,7 +19,7 @@ const schmAccount = new schm({
         type: String,
         required: true,
     },
-    nickName: {
+    name: {
         type: String,
         required: true,
         unique: true,
@@ -42,10 +42,6 @@ const schmAccount = new schm({
     // @picture = << url_of_user_picture >>
     picture: {
         type: {
-            _id: {
-                type: Number,
-                required: true,
-            },
             uri: {
                 type: String,
                 required: true,
@@ -108,10 +104,11 @@ const schmAccount = new schm({
     },
 
     role: {
-        type: schm.Types.ObjectId,
-        ref: 'Role',
+        type: [{
+            type: Number,
+        }],
         required: true,
-        default: User_Role,
+        default: USER_INDEX,
     }
   
     },

@@ -1,11 +1,60 @@
 const Account = require('../model/Account');
 const Secrect = require('../Secrect');
 const Crypto = require('crypto');
-const User_Role = require('../model/Role').USER;
-const ActionResult = require('../ActionResult');
+const Functions = require('../constant/Message');
+const AuthService = require('../services/AuthService');
+const UserForRegister = require('../dtos/UserForRegister');
+const {Default,Codes,Contents} = require('../dtos/Response');
 
 class AuthController {
     constructor () {}
+
+    static start (io) {
+        io.on(Functions.CONNECTION, function (socket){
+            console.log('Co nguoi ket noi', socket.id)
+
+            socket.on(Functions.Register, async function(data){
+
+                let userForRegister = {...data};
+
+                let registerResult = await AuthController.register(userForRegister);
+               
+                socket.emit(Functions.Register,registerResult);
+            })
+        })
+    }
+
+    static async register (userForRegister = {
+        ...UserForRegister}) { 
+        
+        userForRegister = {
+            ...UserForRegister,
+            ...userForRegister,
+        }
+
+
+        const noValue = !userForRegister.username 
+            || !userForRegister.password 
+            || !userForRegister.name
+
+            let res = Default;
+            if(noValue) {
+                res.code = Codes.NotFound;
+                res.content = Contents.NotFound;
+                return res;
+            }
+            
+            let resgisterResult = AuthService.register(userForRegister);
+
+            if(!resgisterResult){
+                res.code = Codes.NotFound;
+                res.content = resgisterResult;
+                return res;
+            }
+            res.code = Codes.Success;
+            res.content = resgisterResult;
+            return res;
+        }
 
     static async getToken (
         username = null,
@@ -33,14 +82,10 @@ class AuthController {
         return `${header}.${payload}.${secrect}`;
     }
 
-    static async logIn (
-        username = null,
-        password = null,
-    ) {
-        let user = null;
-        let rs = false;
-
-        user = await AuthController.isExistedUsername(username);
+    static async logIn () {
+        
+        if(!username || !password)
+            return 
 
         if(!user)
             return false;
@@ -70,54 +115,7 @@ class AuthController {
         }).lean();
     }
 
-    static async register  (
-        username = null,
-        password = null,
-        nickName = null,
-        phone = null,
-        email = null,
-        address = null,
-        role = User_Role,
-        star = {
-            total: 0,
-            list: [],
-        },
-        friends = [],
-    ) {
-        let user = null;
-
-        user = await AuthController.isExistedUsername(username);
-
-        if(!user) return new ActionResult(
-            ActionResult.CODE.ERROR,
-            ActionResult.EXCEPTION.VALID_INVIDUAL_INFORMATION,
-            true,
-        )
-
-        let rs = await Account.Model.insertMany([{
-            username ,
-            password ,
-            nickName ,
-            phone ,
-            email,
-            address,
-            role,
-            star,
-            friends,
-        }])
-
-        if(!rs) return new ActionResult(
-            ActionResult.CODE.ERROR,
-            ActionResult.EXCEPTION.DB_NO_SERVE,
-            true,
-        )
-
-        return new ActionResult(
-            ActionResult.CODE.OK,
-            user,
-            true,
-        );
-    }
+    
 }
 
 module.exports = AuthController;
