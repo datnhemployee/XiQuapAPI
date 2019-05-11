@@ -1,5 +1,4 @@
-const Crypto = require('crypto');
-const Hash = Crypto.createHash('sha512');
+const crypto = require('crypto');
 
 exports.getRandomString = (length = 10) => {
     var text = "";
@@ -11,11 +10,23 @@ exports.getRandomString = (length = 10) => {
   }
 
 exports.hash = (text, secrect) => {
-    Hash.update(
-        Buffer.from(
-            JSON.toString(text + secrect))
-            .toString(),
-    );
 
-    return Hash.digest('hex');
+    
+
+    let rs = crypto.pbkdf2Sync(
+        text,
+        secrect,
+        1000,
+        512,
+        'sha512'
+    ).toString('hex');
+
+    
+
+    return rs;
+}
+
+exports.checkEmail = (email = '') => {
+    let patt = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i);
+    return patt.test(email);
 }

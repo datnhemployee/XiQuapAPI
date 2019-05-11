@@ -1,7 +1,7 @@
 const Codes = {
     Ok: 200,
     Success: 201,
-    NotFound: 404,
+    Exception: 404,
     Authorization: 403,
 
 }
@@ -9,7 +9,7 @@ const Codes = {
 const Encodes = {
     [Codes.Ok]: 'Ok',
     [Codes.Success]: 'Success',
-    [Codes.NotFound]: 'NotFound',
+    [Codes.Exception]: 'Exception',
     [Codes.Authorization]: 'Forbiden',
 }
 const Contents = {

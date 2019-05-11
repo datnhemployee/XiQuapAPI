@@ -5,6 +5,11 @@ const USER_INDEX = require('../model/Role').USER_INDEX;
 const schm = mongoose.Schema;
 
 const schmAccount = new schm({
+    point: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
     username: {
         type: String,
         required: true,
@@ -38,15 +43,15 @@ const schmAccount = new schm({
         type: String,
         required: false,
     },
+    token: {
+        type: String,
+        required: false,
+        unique: true,
+    },
 
     // @picture = << url_of_user_picture >>
-    picture: {
-        type: {
-            uri: {
-                type: String,
-                required: true,
-            }
-        },
+    avatar: {
+        type: String,
         required: false,
     },
   
@@ -55,51 +60,56 @@ const schmAccount = new schm({
         required: false,
         default: '',
     },
-  
-    star: {
-        type: {
-            total: {
-                type: Number,
-                required: true,
-                default: 0,
-            },
-            list: {
-                type: [{
-                    account: {
-                        type: schm.Types.ObjectId,
-                        ref: 'Account',
-                        required: true,
-                    },
-                    post: {
-                        type: Number,
-                        required: true,
-                    },
-                    date: {
-                        type: Date,
-                        required: true,
-                    }
-                }]
-            }
-        },
+
+    totalStar: {
+        type: Number,
         required: true,
-        default: {
-            total: 0,
-            list: [],
-        },
+        default: 0,
     },
   
-    friends: {
+    star: {
+        type: [{
+                account: {
+                    type: schm.Types.ObjectId,
+                    ref: 'Account',
+                    required: true,
+                },
+                item: {
+                    type: schm.Types.ObjectId,
+                    ref: 'Item',
+                    required: true,
+                },
+                date: {
+                    type: Date,
+                    required: true,
+                }
+            }],
+        required: true,
+        default: [],
+    },
+
+    totalFollowers: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
+
+    followers: {
         type:[{
-            account: {
+            Id: {
                 type: schm.Types.ObjectId,
                 ref: 'Account',
+                required: true,
+            },
+            name: {
+                type: String,
+                required: true,
             },
             date: {
                 type: Date,
                 required: true,
             },
         }],
-        required: false,
         default: [],
     },
 
@@ -109,12 +119,46 @@ const schmAccount = new schm({
         }],
         required: true,
         default: USER_INDEX,
-    }
+    },
+
+    totalItem: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
   
+    item: {
+        type: [{
+            Id: {
+                type: schm.Types.ObjectId,
+                ref: 'Item',
+                required: true,
+            },
+            info: {
+                type: String,
+                required: true,
+                default: '',
+            },
+            mainPhoto: {
+                type: String,
+                required: true,
+            },
+            totalStar: {
+                type: Number,
+                required: true,
+                default: 0,
+            },
+            totalExchange: {
+                typeNumber: Number,
+                required: true,
+                default: 0,
+            }
+        }]
+    }
     },
     {
       versionKey: 'v1',
-    });
+});
 
     exports.Schema = schmAccount;
 

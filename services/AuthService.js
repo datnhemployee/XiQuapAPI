@@ -1,34 +1,60 @@
 const AuthRepository = require('../repositories/AuthRepository');
-const UserToLogIn = require('../dtos/UserToLogIn');
+const {Codes} = require('../dtos/Response');
+const checkEmail = require('../Helpers/StringGenerater').checkEmail;
 
 module.exports = class AuthService {
-    constructor () {}
+    static validate_userForLogIn (userForLogIn) {
+        return userForLogIn.username.length < 8 ? 
+                    'Tên tài khoản phải có độ dài trên 8 kí tự': 
+                userForLogIn.password.length < 8 ?
+                    'Mật khẩu phải có độ dài trên 8 kí tự': 
+                    undefined;
+    }
 
-    async logIn ({
-        username,
-        password,
-    } = {...UserToLogIn}) {
+    static async logIn (userForLogIn) {
 
-        return await this._repo.logIn({
-            username,
-            password,
-        });
+        let constrainst = AuthService.validate_userForLogIn(userForLogIn) 
+        
+        if(!constrainst){
+            return await AuthRepository.logIn(userForLogIn);
+        }
+
+        return {
+            code: Codes.Exception,
+            content: constrainst,
+        }
     }
 
     static async register (userForRegister) {
-
-        const constrainst = 
-            userForRegister.username.length < 8 ? 
-                'Tên tài khoản phải có độ dài trên 8 kí tự': 
-            userForRegister.password.length < 8 ?
-                'Mật khẩu phải có độ dài trên 8 kí tự': 
+        let constrainst = AuthService.validate_userForLogIn(userForRegister) 
+        constrainst = !!constrainst ? 
+                constrainst :
             userForRegister.name.length < 8 ?
                 'Tên người dùng phải trên 8 kí tự':
+            !checkEmail(userForRegister.email) ?
+                'Email không hợp lệ.':
                 undefined;
+        
         if ( !constrainst ){
-
             return await AuthRepository.register(userForRegister);
         }
-        return constrainst;
+
+        return {
+            code: Codes.Exception,
+            content: constrainst,
+        }
+    }
+
+    static async logOut (userForLogOut) {
+        let constrainst = undefined;
+        
+        if ( !constrainst ){
+            return await AuthRepository.logOut(userForRegister);
+        }
+
+        return {
+            code: Codes.Exception,
+            content: constrainst,
+        }
     }
 }

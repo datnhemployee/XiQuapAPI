@@ -5,22 +5,25 @@ const app = express();
 const server = require('http').Server(app);
 var io = require('socket.io')(server);
 server.listen(3000);
-const MESSAGE = require('./constant/Message');
 const AuthController = require('./controller/AuthController');
+const ExchangeController = require('./controller/ExchangeController');
+const StockController = require('./controller/StockController');
 
 const seed = require('./Seed');
+seed.seed();
 
-// seed.seed();
-// io.on(MESSAGE.CONNECTION, function (socket){
-//     console.log('Co nguoi ket noi', socket.id)
+let SessionController = {
+    list: []
+};
 
-//     socket.on('register', function(data){
-//         AuthController
-//     })
-// })
+const Methods = {
+    Connection: 'connection',
+}
 
+io.of().on(Methods.Connection, function (socket){
+    console.log('Co nguoi ket noi', socket.id)
 
-AuthController.start(io);
-
-
-
+    AuthController.start(socket,SessionController);
+    ExchangeController.start(socket,SessionController);
+    // StockController.start(socket,SessionController);
+});

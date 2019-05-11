@@ -1,106 +1,157 @@
 const AccountManager = require('../model/Account').Model;
-const Mongoose = require('mongoose');
 const Account =  require('../model/Account').Model;
 const getRandomString = require('../Helpers/StringGenerater').getRandomString;
 const hash = require('../Helpers/StringGenerater').hash;
+const {Codes} = require('../dtos/Response');
 
 module.exports = class AuthRepository {
+    static async logIn (userForLogIn) {
+        let user = await AuthRepository.hasUsername(userForLogIn.username);
 
-    constructor () {
+        if(!!user) {
+            userForLogIn.password = AuthRepository.getHashPassword(
+                userForLogIn,
+                user.salt,
+            );
+
+            if(userForLogIn.password === user.password){
+
+               let {
+                    _id,
+                    name,
+                } = user;
+
+                return {
+                    code: Codes.Success,
+                    content: {
+                        id: _id,
+                        name: name,
+                    }
+                }
+            }
+        }
+
+        return {
+            code: Codes.Exception,
+            content: 'Tên tài khoản hoặc mật khẩu chưa chính xác.',
+        }
     }
 
-    static async getToken (
-        username = null,
-        name = null,
-        role = null,
+    static async hasToken (
+        token,
     ) {
-        const header = Buffer.from(
-            JSON.toString(Secrect))
-            .toString();
-        const hmac = Crypto.createHmac(
-            'sha512',
-            Buffer.from(
-                JSON.toString(Secrect))
-                .toString(),
-        )
-        const payload = Buffer.from(
-            JSON.toString({
-                username,
-                name,
-                role,
-            }))
-            .toString();;
-        const secrect = hmac.digest('base64');
-
-        return `${header}.${payload}.${secrect}`;
+        return await AuthRepository
+            .has('token',token);
     }
-    
-    logIn () {
+
+    static async hasEmail (
+        email,
+    ) {
+        return await !!AuthRepository
+            .has('email',email);
     }
 
     static async hasUsername (
-        username = null,
+        username
     ) {
-        const query = {
-            username: username,
-        };
-        const projection = `username`;
-
-        return !!(await AccountManager
-            .findOne(query)
-            .select(projection)
-            .lean());
+        return await AuthRepository
+            .has('username',username);
     }
 
-    static async hashPasswordAndCreateSalt (
-        userForRegister, 
-        isCheckUsername = false) {
-        let {
-            username,
-        } = userForRegister;
+    static async has(field,value) {
+        const query = {
+            [field]:value,
+        };
+        return await AccountManager
+            .findOne(query)
+            .lean();
+    }
 
-        if (!isCheckUsername){
-            let hasUsername = 
-                await AuthRepository.hasUsername(username);
+    static getHashPassword (
+        user,
+        salt) {
 
-            if(hasUsername) return null;
-        }
+        
+        
 
-
-        userForRegister.salt = getRandomString(20);
-
-        userForRegister.password = hash(
-            userForRegister.password,
-            userForRegister.salt)
-
+        return hash(
+            user.password,
+            salt
+        )
     }
 
     static async register (userForRegister) {
 
         let {
             username,
+            email,
         } = userForRegister;
 
-        let hasUsername = await AuthRepository.hasUsername(username);
+        let hasEmail = await AuthRepository.hasEmail(email);
+        
+        if(hasEmail) return {
+            code: Codes.Exception,
+            content: 'Tên tài khoản đã tồn tại hoặc email đã tồn tại.'
+        }
 
-        if(hasUsername) return null;
+        let user = await AuthRepository.hasUsername(username);
 
-        await AuthRepository.hashPasswordAndCreateSalt(
+        if(!!user) return {
+            code: Codes.Exception,
+            content: 'Tên tài khoản đã tồn tại hoặc email đã tồn tại.'
+        }
+
+        userForRegister.salt = getRandomString(20);
+        let hashPasswword = AuthRepository.getHashPassword(
             userForRegister,
-            true,
+            userForRegister.salt,
         );
-
+        console.log('hashPasswword: ' +JSON.stringify(hashPasswword));
+        userForRegister.password = hashPasswword;
 
 
         let hasError = false;
         const UserToDB = new Account(userForRegister);
-        await UserToDB.save((err,res)=>{
+        await UserToDB.save((err)=>{
             console.log('err: '+ JSON.stringify(err))    
             if(!!err) hasError = true;
         });
 
-        if(!hasError) return null;
-        return {...UserToDB};
+        if(!hasError) return {
+            code: Codes.Exception,
+            content: 'Lỗi kết nối cơ sở dữ liệu.',
+        };
+        return {
+            code: Codes.Success,
+            content: UserToDB,
+        };
+    }
 
+    static async logOut (userForLogOut) {
+        let {
+            token,
+        } = userForLogOut;
+
+        let user = await AccountManager.findOne({
+            token: token,
+        }).lean();
+
+        if(!!user) {
+            await AccountManager.findOneAndUpdate({
+                token: token,
+            }, {
+                token: '',
+            });
+
+            return {
+                code: Codes.Success,
+                content: 'Đăng xuất thành công',
+            }
+        }
+
+        return {
+            code: Codes.Exception,
+            content: 'Đăng xuất thất bại',
+        }
     }
 }
