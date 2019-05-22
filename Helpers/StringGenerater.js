@@ -11,17 +11,13 @@ exports.getRandomString = (length = 10) => {
 
 exports.hash = (text, secrect) => {
 
-    
-
     let rs = crypto.pbkdf2Sync(
         text,
         secrect,
         1000,
         512,
         'sha512'
-    ).toString('hex');
-
-    
+    ).toString('hex').slice(1,20);;
 
     return rs;
 }
@@ -29,4 +25,9 @@ exports.hash = (text, secrect) => {
 exports.checkEmail = (email = '') => {
     let patt = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i);
     return patt.test(email);
+}
+
+exports.checkPhone = (phone = '')=> {
+    let patt = new RegExp(/^\d+$/);
+    return !!phone && phone.length > 7 && patt.test(phone); 
 }

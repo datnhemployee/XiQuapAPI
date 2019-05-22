@@ -1,55 +1,36 @@
 const {Codes} = require('../dtos/Response');
-const AuthRepository = require('./AuthRepository');
 const Item = require('../model/Item').Model;
+const ItemManager = require('../model/Item').Model;
 
 
 module.exports = class ItemRepository {
-    static async addItem (itemForAdd) {
-        let user = await AuthRepository.hasToken(itemForAdd.token);
-        let type = await TypeRepository.hasName(itemForAdd.typeName);
+    static async insert (itemForInsert) {
+        
+        let temp = new Item(itemForInsert);
+        await temp.save()
 
-        let error = !user ?
-            'Không tìm thấy người dùng này.':
-                !type ?
-            'Không tìm thấy loại vật phẩm tương ứng.':
-            undefined;
-
-        if(!error) {
-            itemForAdd = {
-                ...itemForAdd,
-                ownerAvatar: user.avatar,
-                ownerId: user._id,
-                typeName: type.name,
-                point: type.point,
-            }
-            
-            let temp = new Item(itemForAdd);
-            let result = {
-                code: Codes.Success,
-            }
-            await temp.save((err,res) => {
-                if(!!err){
-                    result = {
-                        code:Codes.Exception,
-                        content: err,
-                    }
-                    return;
-                }
-                result = {
-                    code:Codes.Success,
-                    content: res,
-                }
-            })
-
-            return result;
-        }
-
-        return {
-            code: Codes.Exception,
-            content: error,
-        }
+        return temp;
     }
 
-    
+    static async getByPage (page) {
+        return await ItemManager
+            .find()
+            .sort({_id: -1})
+            .skip(page * 5)
+            .limit(5);
+    }
+
+    static async findById (id) {
+        return await ItemManager
+            .findById(id)
+            .lean();
+    }
+
+    static async updateAsync (id, itemUpdate) {
+        return await ItemManager.updateOne(
+            {_id: id},
+            itemUpdate
+        );
+    }
 
 }

@@ -1,21 +1,23 @@
-const userRoleID = require('../model/Role').USER_INDEX;
-const EMPTY_STRING = '';
-const INTIAL_NUMBER = 0;
-
 const UserForRegister = {
-    username: EMPTY_STRING,
-    password: EMPTY_STRING,
-    salt: EMPTY_STRING,
-    name: EMPTY_STRING,
-    phone : EMPTY_STRING,
-    email : EMPTY_STRING,
-    address : EMPTY_STRING,
-    role : [userRoleID],
-    star : {
-        total: 0,
-        list: [],
-    },
-    friends : [],
+    point: 0,
+    username: null,
+    password: null,
+    salt: null,
+    name: null,
+    phone: null,
+    email: null,
+    address: null,
+    token: null,
+    avatar: null,
+    intro: null,
+    totalStar: 0,
+    star: [],
+    totalFollowers: 0,
+    totalLike: 0,
+    likes: [],
+    followers: [],
+    role: 0,
+    totalItem: 0,
 
 }
 

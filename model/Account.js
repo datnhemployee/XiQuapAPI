@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const mongo = require('../constant/Connection')
-const USER_INDEX = require('../model/Role').USER_INDEX;
 
 const schm = mongoose.Schema;
 
@@ -101,10 +100,6 @@ const schmAccount = new schm({
                 ref: 'Account',
                 required: true,
             },
-            name: {
-                type: String,
-                required: true,
-            },
             date: {
                 type: Date,
                 required: true,
@@ -114,11 +109,9 @@ const schmAccount = new schm({
     },
 
     role: {
-        type: [{
-            type: Number,
-        }],
+        type: Number,
         required: true,
-        default: USER_INDEX,
+        default: 0,
     },
 
     totalItem: {
@@ -126,35 +119,39 @@ const schmAccount = new schm({
         required: true,
         default: 0,
     },
+
+    // Những bài viết mà người dùng like
+    like: {
+        type: [{
+            Id: {
+                type: schm.Types.ObjectId,
+                ref: 'Item',
+            },
+        }],
+        default: [],
+    },
   
+    // Những bài viết của riêng người dùng đăng
     item: {
         type: [{
             Id: {
                 type: schm.Types.ObjectId,
                 ref: 'Item',
-                required: true,
             },
-            info: {
-                type: String,
-                required: true,
-                default: '',
-            },
-            mainPhoto: {
-                type: String,
-                required: true,
-            },
-            totalStar: {
-                type: Number,
-                required: true,
-                default: 0,
-            },
-            totalExchange: {
-                typeNumber: Number,
-                required: true,
-                default: 0,
-            }
-        }]
-    }
+        }],
+        required: false,
+    },
+
+    chats: [{
+        acquaintance: {
+            type: schm.Types.ObjectId,
+            ref: 'Account',
+        },
+        messages: [{
+            belongTo: Boolean, // true is first person, false is the acquaintance
+            content: String,
+        }],
+    }]
     },
     {
       versionKey: 'v1',

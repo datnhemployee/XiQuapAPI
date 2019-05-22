@@ -4,7 +4,7 @@ const dbUsername = 'admin123';
 const dbPassword = 'admin123';
 
 const uri = `mongodb://${dbUsername}:${dbPassword}`
-  + `@ds223756.mlab.com:23756/spense`;
+  + `@ds041157.mlab.com:41157/xiquap`;
   
 exports.URI_MONGOOSE = uri;
 

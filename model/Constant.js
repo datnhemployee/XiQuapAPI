@@ -4,29 +4,11 @@ const mongo = require('../constant/Connection')
 const schm = mongoose.Schema;
 
 const schmConstant = new schm({
-    Id: {
+    id: {
         type: Number,
         required: true,
         default: 0,
         unique: true,
-    },
-    lastestPage: {
-        type: Number,
-        required: true,
-    },
-    maxNumberItemsOfPage: {
-        type: Number,
-        required: true,
-        default: 10,
-    },
-    lastestPageStock: {
-        type: Number,
-        required: true,
-    },
-    maxNumberItemsOfStock: {
-        type: Number,
-        required: true,
-        default: 10,
     },
     modified: {
         type: Boolean,

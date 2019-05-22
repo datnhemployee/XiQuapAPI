@@ -3,8 +3,34 @@ const Account =  require('../model/Account').Model;
 const getRandomString = require('../Helpers/StringGenerater').getRandomString;
 const hash = require('../Helpers/StringGenerater').hash;
 const {Codes} = require('../dtos/Response');
+const Secrect = require('../Secrect');
 
 module.exports = class AuthRepository {
+    static async updateToken (
+        token,
+        username,
+    ) {
+        let user = await AuthRepository.hasUsername(username);
+
+        if(!!user) {
+            await AccountManager.updateOne({
+                username: username
+            }, {
+                token: token,
+            }).lean();
+
+            return {
+                code: Codes.Success,
+                content: token,
+            }
+        }
+
+        return {
+            code: Codes.Exception,
+            content: 'Không tồn tại người dùng này.',
+        }
+    }
+
     static async logIn (userForLogIn) {
         let user = await AuthRepository.hasUsername(userForLogIn.username);
 
@@ -17,14 +43,12 @@ module.exports = class AuthRepository {
             if(userForLogIn.password === user.password){
 
                let {
-                    _id,
                     name,
                 } = user;
 
                 return {
                     code: Codes.Success,
                     content: {
-                        id: _id,
                         name: name,
                     }
                 }
@@ -47,8 +71,8 @@ module.exports = class AuthRepository {
     static async hasEmail (
         email,
     ) {
-        return await !!AuthRepository
-            .has('email',email);
+        return !!(await AuthRepository
+            .has('email',email));
     }
 
     static async hasUsername (
@@ -71,9 +95,6 @@ module.exports = class AuthRepository {
         user,
         salt) {
 
-        
-        
-
         return hash(
             user.password,
             salt
@@ -88,6 +109,7 @@ module.exports = class AuthRepository {
         } = userForRegister;
 
         let hasEmail = await AuthRepository.hasEmail(email);
+        console.log(`hasEmail ${JSON.stringify(hasEmail)}`)
         
         if(hasEmail) return {
             code: Codes.Exception,
@@ -95,6 +117,7 @@ module.exports = class AuthRepository {
         }
 
         let user = await AuthRepository.hasUsername(username);
+        console.log(`user ${JSON.stringify(user)}`)
 
         if(!!user) return {
             code: Codes.Exception,
@@ -110,20 +133,17 @@ module.exports = class AuthRepository {
         userForRegister.password = hashPasswword;
 
 
-        let hasError = false;
         const UserToDB = new Account(userForRegister);
-        await UserToDB.save((err)=>{
-            console.log('err: '+ JSON.stringify(err))    
-            if(!!err) hasError = true;
-        });
+        await UserToDB.save();
+        console.log(`UserToDB ${JSON.stringify(UserToDB)}`)
 
-        if(!hasError) return {
-            code: Codes.Exception,
-            content: 'Lỗi kết nối cơ sở dữ liệu.',
-        };
+
         return {
             code: Codes.Success,
-            content: UserToDB,
+            content: {
+                name: UserToDB.name,
+                token: UserToDB.token,
+            }
         };
     }
 

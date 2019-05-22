@@ -6,15 +6,20 @@ const schm = mongoose.Schema;
 const schmItem = new schm({
     ownerId: {
         type: schm.Types.ObjectId,
+        ref: 'Account',
         required: true,
+    },
+    ownerName: {
+        type: String,
+        required: true, 
     },
     ownerAvatar: {
         type: String,
-        required: true,
+        required: false, // sẽ yêu cầu trong việc sử dụng cloudinary
     },
     mainPicture: {
         type: String,
-        required: true,
+        required: false,// sẽ yêu cầu trong việc sử dụng cloudinary
     },
     otherPictureList: {
         type: [String],
@@ -26,7 +31,7 @@ const schmItem = new schm({
         required: true,
         default: ''
     },
-    info: {
+    description: {
         type: String,
         required: false,
         default: '',
@@ -67,56 +72,38 @@ const schmItem = new schm({
     },
     likeList: {
         type: [{
-            id: {
+            Id: {
                 type: schm.Types.ObjectId,
                 ref: 'Account',
                 required: true,
             },
-            name: {
-                type: String,
-                required: true,
-            }
         }]
     },
-
-    exchangeType: {
-        type: Number,
-        required: true,
-        default: 0,
-    },
-
-    totalExchange: {
+    totalItem: {
         type: Number,
         required: true,
         default: 0,
     },
   
-    exchangeList: {
+    itemList: {
         type: [{
-            id: {
-                type: schm.Types.ObjectId,
-                ref: 'Item',
+            name: {
+                type: String,
                 required: true,
             },
-            vendeeID: {
+            description: {
+                type: String,
+                required: true,
+            },
+            photoUrl: {
+                type: String,
+                required: false,
+            },
+            vendeeId: {
                 type: schm.Types.ObjectId,
                 ref: 'Account',
                 required: true,
             },
-            vendeeName: {
-                type: String,
-                ref: 'Account',
-                required: true,
-            },
-            vendeeStar: {
-                type: Number,
-                required: true,
-            },
-            info: {
-                type: String,
-                required: true,
-                default: '',
-            }
         }],
         default: [],
     }
