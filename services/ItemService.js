@@ -8,11 +8,11 @@ const UserRepository = require('../repositories/UserRepository');
 module.exports = class ItemService {
 
     
-    static async insert (itemForInsert) {
+    static async insert (request) {
 
         let {
             name,
-        } = itemForInsert
+        } = request
         let constrainst = name.length < 8 ?
             'Tên vật phẩm phải trên 8 kí tự.':
             undefined;
@@ -21,7 +21,7 @@ module.exports = class ItemService {
             let {
                 token,
                 typeName,
-            } = itemForInsert;
+            } = request;
             let session = SessionRepository.findByToken(token);
 
             if(!session) return {
@@ -48,19 +48,17 @@ module.exports = class ItemService {
             } = session;
 
             let userFromRepo = await AuthRepository.hasUsername(username);
-            delete itemForInsert.token;
+            delete request.token;
 
             let {
                 _id,
-                avatar,
-                totalItem,
+                totalOwned,
             } = userFromRepo;
 
-            itemForInsert.ownerId = _id;
-            itemForInsert.ownerAvatar = avatar;
-            itemForInsert.point = point;
+            request.owner = _id;
+            request.point = point;
 
-            let itemInsertResult = await ItemRepository.insert(itemForInsert);
+            let itemInsertResult = await ItemRepository.insert(request);
 
             // console.log(`itemInsertResult: ${JSON.stringify(itemInsertResult)}`)
 
@@ -68,10 +66,10 @@ module.exports = class ItemService {
                 _id,
                 {
                     $set: {
-                        totalItem: totalItem + 1,
+                        totalOwned: totalOwned + 1,
                     },
                     $push: {
-                        item: itemInsertResult._id,
+                        ownedItem: itemInsertResult._id,
                     }
                 }
             );
@@ -271,7 +269,7 @@ module.exports = class ItemService {
 
         if(!session) return {
             code: Codes.Authorization,
-            content: `Không thể thích bài viết khi chưa đăng nhập.`,
+            content: `Không thể đăng trao đổi khi chưa đăng nhập.`,
         }
 
         let {
@@ -323,6 +321,30 @@ module.exports = class ItemService {
             }
         }
 
+        let userItemUpdate = {
+            $set: {
+                totalWaitting: userFromRepo.totalWaitting + 1,
+            },
+            $push: {
+                waittingItem: {
+                    item: _id,
+                    date: new Date(),
+                }
+            },
+        }
+
+        try {
+            await UserRepository.updateAsync(
+                userFromRepo._id,
+                userItemUpdate
+            );
+        } catch (userItemException) {
+            return {
+                code: Codes.Error,
+                content: ` Không thể cập nhật người dùng vì ${JSON.stringify(userItemException)}`
+            }
+        }
+
         try {
             itemFromRepo = await ItemRepository.findById(_id);
         } catch (itemGetException) {
@@ -336,6 +358,109 @@ module.exports = class ItemService {
             code: Codes.Success,
             content: itemFromRepo,
         }
-     }
+    }
+
+    static async approve (request) {
+        let {
+            token,
+            _id,
+            _idAprroved,
+        } = request;
+
+        let session = SessionRepository.findByToken(token);
+
+        if(!session) return {
+            code: Codes.Authorization,
+            content: `Không thể đăng trao đổi khi chưa đăng nhập.`,
+        }
+
+        let {
+            username,
+        } = session;
+
+        let userFromRepo = await AuthRepository.hasUsername(username);
+        
+        if (!userFromRepo) {
+            return {
+                code: Codes.Exception,
+                content: `Không tồn tại người dùng này.`,
+            }
+        }
+
+        let itemFromRepo = await ItemRepository.findById(_id);
+
+        if (!itemFromRepo) {
+            return {
+                code: Codes.Exception,
+                content: `Không tồn tại bài viết này.`,
+            }
+        }
+
+        let approvedIndex = itemFromRepo.itemList.findIndex((val)=>val._id===_idAprroved);
+        if (!itemFromRepo) {
+            return {
+                code: Codes.Exception,
+                content: `Không tồn tại vật trao đổi này.`,
+            }
+        }
+        
+        let itemUpdate = {
+            $set: {
+                vendee: userFromRepo._id,
+            },
+        }
+
+        try {
+            await ItemRepository.updateAsync(
+                _id,
+                itemUpdate
+            );
+
+        } catch (itemUpdateException) {
+            return {
+                code: Codes.Error,
+                content: ` Không thể cập nhật bài viết vì ${JSON.stringify(itemUpdateException)}`
+            }
+        }
+
+        let userItemUpdate = {
+            $set: {
+                totalAprroved: userFromRepo.totalAprroved + 1,
+            },
+            $push: {
+                approvedItem: {
+                    item: _id,
+                    date: new Date(),
+                },
+            }
+        }
+
+        try {
+            await UserRepository.updateAsync(
+                userFromRepo._id,
+                userItemUpdate
+            );
+        } catch (userItemException) {
+            return {
+                code: Codes.Error,
+                content: ` Không thể cập nhật người dùng vì ${JSON.stringify(userItemException)}`
+            }
+        }
+
+        try {
+            itemFromRepo = await ItemRepository.findById(_id);
+        } catch (itemGetException) {
+            return {
+                code: Codes.Error,
+                content: ` Không thể lấy bài viết vì ${JSON.stringify(itemGetException)}`
+            }
+        }
+
+        return {
+            code: Codes.Success,
+            content: itemFromRepo,
+        }
+    }
+
 
 }

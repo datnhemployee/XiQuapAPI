@@ -13,7 +13,14 @@ module.exports = class ItemRepository {
 
     static async getByPage (page) {
         return await ItemManager
-            .find()
+            .find({
+                vendee: null
+            })
+            .populate({
+                path:  'owner',
+                model: 'Account',
+                select: 'name _id totalStar avatar' 
+            })
             .sort({_id: -1})
             .skip(page * 5)
             .limit(5);
@@ -35,11 +42,21 @@ module.exports = class ItemRepository {
                         model: 'Account',
                         select: 'name _id totalStar' 
                     })
+                    .populate({
+                        path:  'owner',
+                        model: 'Account',
+                        select: 'name _id totalStar' 
+                    })
                     .lean();
             },
             default: async function () {
                 return await ItemManager
                     .findById(id)
+                    .populate({
+                        path:  'owner',
+                        model: 'Account',
+                        select: 'name _id totalStar' 
+                    })
                     .lean();
             }
         }

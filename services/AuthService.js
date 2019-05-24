@@ -7,6 +7,27 @@ const SessionRepository = require('../repositories/SessionRepository');
 
 module.exports = class AuthService {
 
+    static async disconnect (session) {
+        let response = SessionRepository.findBySession(session);
+        console.log(`disconnect ${response}`)
+        if(!!response){
+            response = await AuthRepository.updateToken(
+                null,
+                response.username,
+            );
+
+            if (response.code === Codes.Success){
+                SessionRepository.removeBySession(session);
+            }
+
+            return response;
+        }
+        return {
+            code: Codes.Exception,
+            content: ` Người dùng không tồn tại.`
+        }
+    }
+
     static async logIn (userForLogIn,session) {
         let {
             username,

@@ -11,6 +11,25 @@ module.exports = class SessionRepository {
 
     static get () {return _list};
 
+    static removeBySession (session) {
+        let index = SessionRepository.get().findIndex((val)=>val.session === session);
+        if(index != -1){
+            SessionRepository.get().splice(index,1);
+            return {
+                code: Codes.Success,
+                content: SessionRepository.get(),
+            }
+        }
+        return {
+            code: Codes.Exception,
+            content: `Hiện người dùng chưa tham gia vào mạng.`,
+        }
+    }
+
+    static findBySession (session) {
+        // console.log(`thêm người dùng online: ${JSON.stringify(SessionRepository.get())}`)
+        return SessionRepository.get().find((val)=>val.session === session );
+    }
     static findByToken (token) {
         // console.log(`thêm người dùng online: ${JSON.stringify(SessionRepository.get())}`)
         return SessionRepository.get().find((val)=>val.token === token );
@@ -46,9 +65,10 @@ module.exports = class SessionRepository {
     ) {
         let index = SessionRepository.contain(username);
         if(index != -1){
+            SessionRepository.get().splice(index,1);
             return {
                 code: Codes.Success,
-                content: SessionRepository.list.filter((val) => val.username != username),
+                content: SessionRepository.get(),
             }
         }
         return {

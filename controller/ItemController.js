@@ -16,6 +16,7 @@ class ItemController {
         on_emit(socket,Document.getItem,ItemController.getItem);
         on_emitAll(io,socket,Document.giveLike,ItemController.giveLike);
         on_emitAll(io,socket,Document.exchange,ItemController.exchange);
+        on_emitAll(io,socket,Document.approve,ItemController.approve);
         // listen(socket,Methods.getPage,SessionController);
         // listen(socket,Methods.getItem,SessionController);
         // listen(socket,Methods.likeItem,SessionController);
@@ -76,13 +77,13 @@ class ItemController {
         }
     }
 
-    static async getItems (pageToGet) {
+    static async getItems (request) {
         let {
             token,
             page,
-        } = pageToGet;
+        } = request;
 
-        console.log(`pageToGet: ${JSON.stringify(pageToGet)}`);
+        console.log(`pageToGet: ${JSON.stringify(request)}`);
 
         let constrainst = !token ?
             `Không tìm thấy token.`:
@@ -98,7 +99,7 @@ class ItemController {
             }
         }
         
-        let postsFromService = await ItemService.get(pageToGet);
+        let postsFromService = await ItemService.get(request);
         if(postsFromService.code === Codes.Success){
             return {
                 code: Codes.Success,
@@ -129,6 +130,31 @@ class ItemController {
 
         if (!constrainst) {
             return await ItemService.exchange(input);
+        }
+
+        return {
+            code: Codes.Exception,
+            content: constrainst,
+        }
+    }
+
+    static async approve (request) {
+        let {
+            token,
+            _id,
+            _idApproved,
+        } = request;
+
+        let constrainst = !token ?
+            ` Không tìm thấy token. `:
+            !_id ?
+            ` Không tìm thấy Mã bài viết` :
+            !_idApproved ? 
+            ` Không tìm thấy mã chấp nhận`:
+            undefined;
+
+        if (!constrainst) {
+            return await ItemService.approve(request);
         }
 
         return {

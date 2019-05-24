@@ -3,4 +3,5 @@ module.exports = {
     Register: 'register',
     LogOut: 'log-out',
     TokenLogIn: 'token-log-in',
+    Disconnect: 'disconnect',
 }

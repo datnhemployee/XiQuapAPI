@@ -48,7 +48,6 @@ const schmAccount = new schm({
         unique: true,
     },
 
-    // @picture = << url_of_user_picture >>
     avatar: {
         type: String,
         required: false,
@@ -114,12 +113,6 @@ const schmAccount = new schm({
         default: 0,
     },
 
-    totalItem: {
-        type: Number,
-        required: true,
-        default: 0,
-    },
-
     // Những bài viết mà người dùng like
     like: {
         type: [{
@@ -128,14 +121,92 @@ const schmAccount = new schm({
         }],
         default: [],
     },
+
+    // Những bài người dùng đang chờ đợi
+    totalWaitting: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
+
+    waittingItem: {
+        type: [{
+            item: {
+                type: schm.Types.ObjectId,
+                ref: 'Item',
+            },
+            date: Date,
+        }],
+        required: false,
+    },
   
     // Những bài viết của riêng người dùng đăng
-    item: {
+    totalOwned: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
+
+    ownedItem: {
         type: [{
             type: schm.Types.ObjectId,
             ref: 'Item',
         }],
         required: false,
+    },
+
+    // Những bài viết mà người dùng được chấp nhận trao đổi 
+    totalAprroved: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
+    approvedItem: {
+        type: [{
+            item: {
+                type: schm.Types.ObjectId,
+                ref: 'Item',
+            },
+            date:  Date,
+        }],
+        required: false,
+    },
+
+    // Những món mà người dùng cho vào trong kho quà tặng
+    totalStock: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
+
+    stockList: {
+        type: [{
+            type: schm.Types.ObjectId,
+            ref: 'Stock',
+        }],
+        required: false,
+        default: [],
+    },
+
+    // Những món mà người dùng đổi từ kho quà tặng
+    totalBought: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
+
+    boughtList: {
+        type: [{
+            stock: {
+                type: schm.Types.ObjectId,
+                ref: 'Stock',
+            },
+            date: {
+                type: Date,
+            }
+        }],
+        required: false,
+        default: [],
     },
 
     chats: [{

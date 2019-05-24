@@ -1,25 +1,17 @@
 module.exports = {
-    ownerId: null,
-    ownerName: null,
-    ownerAvatar: null,
-    mainPicture: null,
-    otherPictureList: [],
+    owner: null,
+    mainPicture: '',
+    otherPictureList:[],
     name: null,
     description: '',
     typeName: 'khác',
-    vendeeId: null,
-    vendeeName: null,
-    vendeeTotalStar: 0,
-    vendeeGiveStar: false,
-
+    vendee: null,
     totalLike: 0,
     point: 0,
     likeList: [],
-
-    totalItem:0,
-  
+    totalItem: 0,
     itemList: [],
+    giveStar: false,
 
     token: null,
-    
 }

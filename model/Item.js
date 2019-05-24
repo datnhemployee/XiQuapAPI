@@ -4,18 +4,10 @@ const mongo = require('../constant/Connection')
 const schm = mongoose.Schema;
 
 const schmItem = new schm({
-    ownerId: {
+    owner: {
         type: schm.Types.ObjectId,
         ref: 'Account',
         required: true,
-    },
-    ownerName: {
-        type: String,
-        required: true, 
-    },
-    ownerAvatar: {
-        type: String,
-        required: false, // sẽ yêu cầu trong việc sử dụng cloudinary
     },
     mainPicture: {
         type: String,
@@ -40,26 +32,16 @@ const schmItem = new schm({
         type: String,
         required: true,
     },
-    vendeeId: {
+    vendee: {
         type: schm.Types.ObjectId,
         ref: 'Account',
         required: false,
     },
-    vendeeName: {
-        type: String,
-        required: false,
-    },
-    vendeeTotalStar: {
-        type: Number,
-        required: false,
-        default: 0,
-    },
-    vendeeGiveStar: {
+    giveStar: {
         type: Boolean,
-        required: false,
+        required: true,
         default: false,
     },
-
     totalLike: {
         type: Number,
         required: true,

@@ -15,8 +15,18 @@ class AuthController {
     static start (io,socket) {
         on_emit(socket,Document.Register,AuthController.register);
         on_emit(socket,Document.LogIn,AuthController.logIn);
+        on_emit(socket,Document.Disconnect,AuthController.disconnect);
         // listen(socket,Document.LogOut,AuthController.logOut);
         // listen(socket,Document.TokenLogIn,AuthController.tokenLogIn);
+    }
+
+    static async disconnect (
+        request,
+        socket,
+    ) {
+        socket.disconnect(true);
+        socket.removeAllListeners(Document.Disconnect);
+        return await AuthService.disconnect(socket.id);
     }
 
     // static tokenLogIn (
