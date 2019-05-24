@@ -1,7 +1,14 @@
 module.exports = {
     insertItem: 'insert-item',
 
-    getItem: 'get-items',
+    getItems: 'get-items',
     giveLike: 'give-like',
     exchange: 'exchange',
+    getItem: 'get-item',
+
+    getOption: {
+        population: {
+            itemList: `itemList`,
+        }
+    }
 }

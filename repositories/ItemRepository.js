@@ -2,7 +2,6 @@ const {Codes} = require('../dtos/Response');
 const Item = require('../model/Item').Model;
 const ItemManager = require('../model/Item').Model;
 
-
 module.exports = class ItemRepository {
     static async insert (itemForInsert) {
         
@@ -20,11 +19,37 @@ module.exports = class ItemRepository {
             .limit(5);
     }
 
-    static async findById (id) {
-        return await ItemManager
-            .findById(id)
-            .lean();
+    static get getOption () {
+        return require(`../document/ItemDocument`).getOption;
     }
+
+    static async findById (id,option) {
+
+        const Options = ItemRepository.getOption;
+        const query = {
+            [Options.population.itemList]: async function () {
+                return await ItemManager
+                    .findById(id)
+                    .populate({
+                        path:  'itemList.vendee',
+                        model: 'Account',
+                        select: 'name _id totalStar' 
+                    })
+                    .lean();
+            },
+            default: async function () {
+                return await ItemManager
+                    .findById(id)
+                    .lean();
+            }
+        }
+        
+        if (!!query[option])
+            return await query[option]();
+        return await query.default();
+    }
+
+   
 
     static async updateAsync (id, itemUpdate) {
         return await ItemManager.updateOne(

@@ -7,6 +7,7 @@ const UserRepository = require('../repositories/UserRepository');
 
 module.exports = class ItemService {
 
+    
     static async insert (itemForInsert) {
 
         let {
@@ -70,9 +71,7 @@ module.exports = class ItemService {
                         totalItem: totalItem + 1,
                     },
                     $push: {
-                        item: {
-                            Id: itemInsertResult._id,
-                        }
+                        item: itemInsertResult._id,
                     }
                 }
             );
@@ -106,6 +105,32 @@ module.exports = class ItemService {
             return {
                 code: Codes.Exception,
                 content: ` Không còn vật phẩm trao đổi. `,
+            }
+        }
+        return {
+            code: Codes.Success,
+            content: getItemsResult,
+        }
+    }
+
+    static async getItem (input) {
+        let {
+            token,
+            _id,
+            option,
+        } = input;
+        let session = SessionRepository.findByToken(token);
+
+        if(!session) return {
+            code: Codes.Authorization,
+            content: `Không thể xem bài đăng khi chưa đăng nhập.`,
+        }
+
+        let getItemsResult = await ItemRepository.findById(_id,option);
+        if(!getItemsResult){
+            return {
+                code: Codes.Exception,
+                content: ` Không tìm thấy bài viết tương ứng. `,
             }
         }
         return {
@@ -152,7 +177,7 @@ module.exports = class ItemService {
 
         let likeIndex = itemFromRepo.likeList.findIndex((val) => {
 
-            return val.Id.toString() == userFromRepo._id.toString()
+            return val.toString() == userFromRepo._id.toString()
         });
         
         let itemUpdate = {
@@ -160,17 +185,13 @@ module.exports = class ItemService {
                 totalLike:  itemFromRepo.totalLike + 1,
             },
             $push: {
-                likeList: {
-                    Id: userFromRepo._id,
-                }
+                likeList: userFromRepo._id,
             }
         }
 
         let userItemUpdate = {
             $push: {
-                like: {
-                    Id: itemFromRepo._id,
-                }
+                like: itemFromRepo._id,
             }
         }
         console.log(`likeIndex: ${JSON.stringify(likeIndex)}`)
@@ -181,17 +202,13 @@ module.exports = class ItemService {
                     totalLike:  itemFromRepo.totalLike - 1,
                 },
                 $pull: {
-                    likeList: {
-                        Id: userFromRepo._id,
-                    }
+                    likeList:  userFromRepo._id,
                 }
             }
 
             userItemUpdate = {
                 $pull: {
-                    like: {
-                        Id: itemFromRepo._id,
-                    }
+                    like: itemFromRepo._id,
                 }
             }
         } 
@@ -288,7 +305,7 @@ module.exports = class ItemService {
                     name: name,
                     description: description,
                     photoUrl: photoUrl,
-                    vendeeId: userFromRepo._id,
+                    vendee: userFromRepo._id,
                 }
             }
         }

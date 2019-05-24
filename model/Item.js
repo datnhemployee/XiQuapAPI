@@ -72,11 +72,9 @@ const schmItem = new schm({
     },
     likeList: {
         type: [{
-            Id: {
-                type: schm.Types.ObjectId,
-                ref: 'Account',
-                required: true,
-            },
+            type: schm.Types.ObjectId,
+            ref: 'Account',
+            required: true,
         }]
     },
     totalItem: {
@@ -99,7 +97,7 @@ const schmItem = new schm({
                 type: String,
                 required: false,
             },
-            vendeeId: {
+            vendee: {
                 type: schm.Types.ObjectId,
                 ref: 'Account',
                 required: true,

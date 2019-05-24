@@ -95,7 +95,7 @@ const schmAccount = new schm({
 
     followers: {
         type:[{
-            Id: {
+            info: {
                 type: schm.Types.ObjectId,
                 ref: 'Account',
                 required: true,
@@ -123,10 +123,8 @@ const schmAccount = new schm({
     // Những bài viết mà người dùng like
     like: {
         type: [{
-            Id: {
-                type: schm.Types.ObjectId,
-                ref: 'Item',
-            },
+            type: schm.Types.ObjectId,
+            ref: 'Item',
         }],
         default: [],
     },
@@ -134,10 +132,8 @@ const schmAccount = new schm({
     // Những bài viết của riêng người dùng đăng
     item: {
         type: [{
-            Id: {
-                type: schm.Types.ObjectId,
-                ref: 'Item',
-            },
+            type: schm.Types.ObjectId,
+            ref: 'Item',
         }],
         required: false,
     },

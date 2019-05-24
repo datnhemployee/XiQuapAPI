@@ -4,6 +4,7 @@ const {Codes} = require('../dtos/Response');
 const on_emit = require('./Controller').on_emit;
 const on_emitAll = require('./Controller').on_emitAll;
 const Document = require('../document/ItemDocument');
+const getOption = require(`../document/ItemDocument`).getOption;
 
 class ItemController {
     constructor () {}
@@ -11,7 +12,8 @@ class ItemController {
     static start (io,socket) {
 
         on_emit(socket,Document.insertItem,ItemController.insert);
-        on_emit(socket,Document.getItem,ItemController.get);
+        on_emit(socket,Document.getItems,ItemController.getItems);
+        on_emit(socket,Document.getItem,ItemController.getItem);
         on_emitAll(io,socket,Document.giveLike,ItemController.giveLike);
         on_emitAll(io,socket,Document.exchange,ItemController.exchange);
         // listen(socket,Methods.getPage,SessionController);
@@ -74,7 +76,7 @@ class ItemController {
         }
     }
 
-    static async get (pageToGet) {
+    static async getItems (pageToGet) {
         let {
             token,
             page,
@@ -127,6 +129,38 @@ class ItemController {
 
         if (!constrainst) {
             return await ItemService.exchange(input);
+        }
+
+        return {
+            code: Codes.Exception,
+            content: constrainst,
+        }
+    }
+
+    static async getItem (input) {
+        let {
+            token,
+            _id,
+            option,
+        } = input;
+
+        let constrainst = !token ?
+            ` Không tìm thấy token. `:
+            !_id ?
+            ` Không tìm thấy Mã bài viết` :
+            undefined;
+        
+        option = !option ? 
+            getOption.population.itemList:
+            option;
+        
+        input = {
+            ...input,
+            option,
+        }
+
+        if (!constrainst) {
+            return await ItemService.getItem(input);
         }
 
         return {
