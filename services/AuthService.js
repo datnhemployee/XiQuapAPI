@@ -4,6 +4,7 @@ const checkEmail = require('../Helpers/StringGenerater').checkEmail;
 const checkPhone = require('../Helpers/StringGenerater').checkPhone;
 const TokenRepository = require('../repositories/TokenRepository');
 const SessionRepository = require('../repositories/SessionRepository');
+const UserRepository = require('../repositories/UserRepository');
 
 module.exports = class AuthService {
 
@@ -46,6 +47,9 @@ module.exports = class AuthService {
            
             let {
                 name,
+                point,
+                avatar,
+                role,
             } = userFromRepo.content;
             let token = TokenRepository.getToken(
                 username,
@@ -57,6 +61,9 @@ module.exports = class AuthService {
             }}
             let updateResult = await AuthRepository.updateToken(token,username);
 
+            // console.log(`role nè: ${typeof role}`)
+            // console.log(`role nè: ${role}`)
+            // console.log(`role nè: ${role === 1}`)
             if(updateResult.code === Codes.Success){
                 let sessionInsertResult = SessionRepository.insert(token,username,session);
                 if(sessionInsertResult.code===Codes.Success)
@@ -65,6 +72,9 @@ module.exports = class AuthService {
                         content: {
                             name: name,
                             token: token,
+                            point,
+                            avatar,
+                            isAdmin: role === 1,
                         }
                     }
                 
@@ -112,7 +122,7 @@ module.exports = class AuthService {
                 name,
             );
             
-            let insetSessionresult = await SessionRepository.insert(
+            let insetSessionresult = SessionRepository.insert(
                 userForRegister.token,
                 userForRegister.username,
                 session);
@@ -141,4 +151,38 @@ module.exports = class AuthService {
             content: constrainst,
         }
     }
+
+    static async getInfo (request) {
+
+        let {
+            token,
+        } = request;
+
+        let session = SessionRepository.findByToken(token);
+
+        if(!session) return {
+            code: Codes.Authorization,
+            content: `Không thể lấy thông tin cá nhân khi chưa đăng nhập.`,
+        }
+
+        let {
+            username,
+        } = session;
+
+        let userFromRepo = await UserRepository.getBriefInfo(username);
+        
+        if (!userFromRepo) {
+            return {
+                code: Codes.Exception,
+                content: `Không tồn tại người dùng này.`,
+            }
+        }
+
+        return {
+            code: Codes.Success,
+            content: userFromRepo,
+        }
+
+    }
+
 }

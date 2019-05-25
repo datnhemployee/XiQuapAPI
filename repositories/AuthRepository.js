@@ -42,15 +42,9 @@ module.exports = class AuthRepository {
 
             if(userForLogIn.password === user.password){
 
-               let {
-                    name,
-                } = user;
-
                 return {
                     code: Codes.Success,
-                    content: {
-                        name: name,
-                    }
+                    content: user,
                 }
             }
         }
@@ -143,6 +137,9 @@ module.exports = class AuthRepository {
             content: {
                 name: UserToDB.name,
                 token: UserToDB.token,
+                avatar: UserToDB.avatar,
+                isAdmin: UserToDB.role === 1,
+                point: UserToDB.point,
             }
         };
     }

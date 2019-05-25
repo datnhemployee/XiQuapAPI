@@ -123,7 +123,7 @@ module.exports = class StockService {
         }
     }
 
-    static async getItem (request) {
+    static async getOne (request) {
         let {
             token,
             _id,
@@ -189,6 +189,11 @@ module.exports = class StockService {
                 content: ` Không đủ điểm để đổi phần quà này.`,
             }
         
+        if (!!userFromRepo.vendee)
+        return {
+            code: Codes.Exception,
+            content: ` Phần quà đã bị đổi.`,
+        }
         let stockUpdate = {
             $set: {
                 vendee: userFromRepo._id,
@@ -274,7 +279,7 @@ module.exports = class StockService {
             }
         }
 
-        if (userFromRepo.role !== -1 ){
+        if (userFromRepo.role !== 1 ){
             return {
                 code: Codes.Exception,
                 content: `Không phải admin.`,
@@ -292,9 +297,13 @@ module.exports = class StockService {
         
         let stockUpdate = {
             $set: {
-                approve: true,
+                approve: !stockFromRepo.approve,
             },
         }
+        console.log(`\n`)
+        console.log(`stock Update 1: ${stockUpdate}`)
+        console.log(`stockFromRepo 1: ${stockFromRepo}`)
+        console.log(`\n`)
 
         try {
             await StockRepository.updateAsync(
@@ -323,10 +332,12 @@ module.exports = class StockService {
                 point: userFromRepo.point + stockFromRepo.point,
             },
         }
+        
 
         if (!stockFromRepo.approve) {
             userStockUpdate = {
                 $set: {
+                    point: userFromRepo.point - stockFromRepo.point,
                     totalStock: userFromRepo.totalStock - 1,
                 },
                 $pull: {
@@ -335,6 +346,10 @@ module.exports = class StockService {
             }
         }
 
+        console.log(`\n`)
+        console.log(`stock Update 2: ${stockFromRepo}`)
+        console.log(`stockFromRepo 2: ${userStockUpdate}`)
+        console.log(`\n`)
         try {
             await UserRepository.updateAsync(
                 userFromRepo._id,

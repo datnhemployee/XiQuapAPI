@@ -49,7 +49,7 @@ module.exports = class StockRepository {
                     .populate({
                         path:  'owner',
                         model: 'Account',
-                        select: 'name _id totalStar' 
+                        select: 'name _id totalStar avatar' 
                     })
                     .lean();
             }

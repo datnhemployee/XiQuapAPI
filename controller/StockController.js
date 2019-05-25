@@ -13,11 +13,9 @@ class StockController {
 
         on_emitAll(io,socket,Document.insert,StockController.insert);
         on_emit(socket,Document.get,StockController.get);
-        // on_emit(socket,Document.getItem,ItemController.getItem);
-        // on_emitAll(io,socket,Document.giveLike,ItemController.giveLike);
-        // on_emitAll(io,socket,Document.exchange,ItemController.exchange);
-        // on_emitAll(io,socket,Document.approve,ItemController.approve);
-        
+        on_emit(socket,Document.getOne,StockController.getOne);
+        on_emitAll(io,socket,Document.buy,StockController.buy);
+        on_emitAll(io,socket,Document.approve,StockController.approve);
         
     }
 
@@ -114,112 +112,72 @@ class StockController {
         return stocksFromService;
     }
 
-    // static async exchange (input) {
-    //     let {
-    //         token,
-    //         _id,
-    //         photoUrl,
-    //         name,
-    //         description
-    //     } = input;
+    static async approve (input) {
+        let {
+            token,
+            _id,
+        } = input;
 
-    //     let constrainst = !token ?
-    //         ` Không tìm thấy token. `:
-    //         !_id ?
-    //         ` Không tìm thấy Mã bài viết` :
-    //         !name ? 
-    //         ` Không tìm thấy tên của vật phẩm trao đổi`:
-    //         undefined;
+        let constrainst = !token ?
+            ` Không tìm thấy token. `:
+            !_id ?
+            ` Không tìm thấy Mã bài viết` :
+            undefined;
 
-    //     if (!constrainst) {
-    //         return await ItemService.exchange(input);
-    //     }
+        if (!constrainst) {
+            return await StockService.approve(input);
+        }
 
-    //     return {
-    //         code: Codes.Exception,
-    //         content: constrainst,
-    //     }
-    // }
+        return {
+            code: Codes.Exception,
+            content: constrainst,
+        }
+    }
 
-    // static async approve (request) {
-    //     let {
-    //         token,
-    //         _id,
-    //         _idApproved,
-    //     } = request;
+    static async buy (request) {
+        let {
+            token,
+            _id,
+        } = request;
 
-    //     let constrainst = !token ?
-    //         ` Không tìm thấy token. `:
-    //         !_id ?
-    //         ` Không tìm thấy Mã bài viết` :
-    //         !_idApproved ? 
-    //         ` Không tìm thấy mã chấp nhận`:
-    //         undefined;
+        let constrainst = !token ?
+            ` Không tìm thấy token. `:
+            !_id ?
+            ` Không tìm thấy Mã vật phẩm` :
+            undefined;
 
-    //     if (!constrainst) {
-    //         return await ItemService.approve(request);
-    //     }
+        if (!constrainst) {
+            return await StockService.buy(request);
+        }
 
-    //     return {
-    //         code: Codes.Exception,
-    //         content: constrainst,
-    //     }
-    // }
+        return {
+            code: Codes.Exception,
+            content: constrainst,
+        }
+    }
 
-    // static async getItem (input) {
-    //     let {
-    //         token,
-    //         _id,
-    //         option,
-    //     } = input;
+    static async getOne (input) {
+        let {
+            token,
+            _id,
+        } = input;
 
-    //     let constrainst = !token ?
-    //         ` Không tìm thấy token. `:
-    //         !_id ?
-    //         ` Không tìm thấy Mã bài viết` :
-    //         undefined;
+        let constrainst = !token ?
+            ` Không tìm thấy token. `:
+            !_id ?
+            ` Không tìm thấy Mã vật phẩm` :
+            undefined;
         
-    //     option = !option ? 
-    //         getOption.population.itemList:
-    //         option;
         
-    //     input = {
-    //         ...input,
-    //         option,
-    //     }
+        if (!constrainst) {
+            return await StockService.getOne(input);
+        }
 
-    //     if (!constrainst) {
-    //         return await ItemService.getItem(input);
-    //     }
-
-    //     return {
-    //         code: Codes.Exception,
-    //         content: constrainst,
-    //     }
-    // }
-
-    // static async giveLike (input) {
-    //     let {
-    //         _id,
-    //         token,
-    //     } = input;
-
-    //     console.log(`GiveLike ${JSON.stringify(input)}`)
-    //     let constrainst = !_id ?
-    //         `Không tìm thấy Mã bài viết.`:
-    //         !token ?
-    //         `Không tìm thấy token`:
-    //         undefined;
-
-    //     if(constrainst) {
-    //         return {
-    //             code: Codes.Exception,
-    //             content: constrainst,
-    //         }
-    //     }
-
-    //     return await ItemService.giveLike(input);
-    // } 
+        return {
+            code: Codes.Exception,
+            content: constrainst,
+        }
+    }
 
     // #endregion
 }

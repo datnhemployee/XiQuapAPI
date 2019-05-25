@@ -16,6 +16,7 @@ class AuthController {
         on_emit(socket,Document.Register,AuthController.register);
         on_emit(socket,Document.LogIn,AuthController.logIn);
         on_emit(socket,Document.Disconnect,AuthController.disconnect);
+        on_emit(socket,Document.GetInfo,AuthController.getInfo);
         // listen(socket,Document.LogOut,AuthController.logOut);
         // listen(socket,Document.TokenLogIn,AuthController.tokenLogIn);
     }
@@ -82,20 +83,20 @@ class AuthController {
         
         const logInResult = await AuthService.logIn(userForLogIn,socket.id);
 
-        if(logInResult.code === Codes.Success){
-            let {
-                token,
-                name,
-            } = logInResult.content;
+        // if(logInResult.code === Codes.Success){
+        //     let {
+        //         token,
+        //         name,
+        //     } = logInResult.content;
 
-            return {
-                code: Codes.Success,
-                content: {
-                    token: token,
-                    name: name,
-                }
-            }
-        }
+        //     return {
+        //         code: Codes.Success,
+        //         content: {
+        //             token: token,
+        //             name: name,
+        //         }
+        //     }
+        // }
         
         return logInResult;
     }   
@@ -153,6 +154,30 @@ class AuthController {
         return registerResult;
     }   
 
+    static async getInfo (request) {
+        let {
+            token,
+        } = request;
+
+        const error = !token?
+            ` Dữ liệu đính kèm không chính xác.`
+            :undefined;
+
+        if (!error) {
+            try {
+                return await AuthService.getInfo(request);
+            } catch (responseError) {
+                return {
+                    code: Codes.Error,
+                    content: ` Không thể lấy thông tin cá nhân vì ${responseError}`,
+                }
+            }
+        }
+        return {
+            code: Codes.Exception,
+            content: error,
+        }
+    }
 
     // static async logOut (userForLogOut = {
     //     ...UserForLogOut,

@@ -18,4 +18,11 @@ module.exports = class UserRepository{
         },userForUpdate).lean();
     }
 
+    static async getBriefInfo (username) {
+
+        return await UserManager
+        .findOne({username:username})
+        .select(`point username name avatar phone email address intro totalStar totalFollowers`)
+    }
+
 }
