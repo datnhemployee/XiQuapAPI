@@ -17,11 +17,7 @@ class ItemController {
         on_emitAll(io,socket,Document.giveLike,ItemController.giveLike);
         on_emitAll(io,socket,Document.exchange,ItemController.exchange);
         on_emitAll(io,socket,Document.approve,ItemController.approve);
-        // listen(socket,Methods.getPage,SessionController);
-        // listen(socket,Methods.getItem,SessionController);
-        // listen(socket,Methods.likeItem,SessionController);
-        // listen(socket,Methods.ItemItem,SessionController);
-        // listen(socket,Methods.approveItem,SessionController);
+        
         
     }
 

@@ -6,23 +6,24 @@ const schm = mongoose.Schema;
 const schmStock = new schm({
     
     owner: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    ownerAvatar: {
-        type: String,
+        type: schm.Types.ObjectId,
+        ref: 'Account',
         required: true,
     },
     mainPicture: {
         type: String,
-        required: true,
+        required: false, // true sau khi dùng cloudinary
     },
     otherPictureList: {
         type: [String],
         required: false,
     },
-    info: {
+    name: {
+        type: String,
+        required: true,
+        default: '',
+    },
+    description: {
         type: String,
         required: false,
         default: '',
@@ -31,44 +32,22 @@ const schmStock = new schm({
         type: String,
         required: true,
     },
-    vendeeId: {
+    vendee: {
         type: schm.Types.ObjectId,
         ref: 'Account',
-        required: true,
+        required: false,
     },
-    vendeeName: {
-        type: String,
-        required: true,
-    },
-    vendeeTotalStar: {
+
+    point: {
         type: Number,
         required: true,
-        default: 0,
+        default: 50,
     },
-    vendeeGiveStar: {
+
+    approve: {
         type: Boolean,
         required: true,
         default: false,
-    },
-
-    totalLike: {
-        type: Number,
-        required: true,
-        default: 0,
-    },
-
-    likeList: {
-        type: [{
-            id: {
-                type: schm.Types.ObjectId,
-                ref: 'Account',
-                required: true,
-            },
-            name: {
-                type: String,
-                required: true,
-            }
-        }]
     },
     
     },

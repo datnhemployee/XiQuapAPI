@@ -86,6 +86,9 @@ const schmAccount = new schm({
         default: [],
     },
 
+    // Những người mà người dùng theo dõi
+
+    // Những người đang theo dõi người dùng
     totalFollowers: {
         type: Number,
         required: true,

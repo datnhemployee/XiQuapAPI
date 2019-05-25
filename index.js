@@ -25,6 +25,6 @@ main()
         
             AuthController.start(io,socket);
             ItemController.start(io,socket);
-            // StockController.start(socket,SessionController);
+            StockController.start(io,socket);
         });
     });
