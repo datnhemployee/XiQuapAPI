@@ -13,6 +13,8 @@ class StockController {
 
         on_emitAll(io,socket,Document.insert,StockController.insert);
         on_emit(socket,Document.get,StockController.get);
+        on_emit(socket,Document.getMyStock,StockController.getMyStock);
+        on_emit(socket,Document.getMyBought,StockController.getMyBought);
         on_emit(socket,Document.getOne,StockController.getOne);
         on_emitAll(io,socket,Document.buy,StockController.buy);
         on_emitAll(io,socket,Document.approve,StockController.approve);
@@ -101,6 +103,74 @@ class StockController {
         }
         
         let stocksFromService = await StockService.get(request);
+        if(stocksFromService.code === Codes.Success){
+            return {
+                code: Codes.Success,
+                content: {
+                    list: stocksFromService.content,
+                }
+            }
+        }
+        return stocksFromService;
+    }
+
+    static async getMyStock (request) {
+        let {
+            token,
+            page,
+        } = request;
+
+        console.log(`getMyStock: ${JSON.stringify(request)}`);
+
+        let constrainst = !token ?
+            `Không tìm thấy token.`:
+            page === 0 ?
+            undefined:
+            !page ?
+            `Không tìm thấy trang ở yêu cầu`:
+            undefined;
+        if(constrainst) {
+            return {
+                code: Codes.Exception,
+                content: constrainst,
+            }
+        }
+        
+        let stocksFromService = await StockService.getMyStock(request);
+        if(stocksFromService.code === Codes.Success){
+            return {
+                code: Codes.Success,
+                content: {
+                    list: stocksFromService.content,
+                }
+            }
+        }
+        return stocksFromService;
+    }
+
+    static async getMyBought (request) {
+        let {
+            token,
+            page,
+        } = request;
+
+        // console.log(`pageToGet: ${JSON.stringify(request)}`);
+
+        let constrainst = !token ?
+            `Không tìm thấy token.`:
+            page === 0 ?
+            undefined:
+            !page ?
+            `Không tìm thấy trang ở yêu cầu`:
+            undefined;
+        if(constrainst) {
+            return {
+                code: Codes.Exception,
+                content: constrainst,
+            }
+        }
+        
+        let stocksFromService = await StockService.getMyBought(request);
         if(stocksFromService.code === Codes.Success){
             return {
                 code: Codes.Success,

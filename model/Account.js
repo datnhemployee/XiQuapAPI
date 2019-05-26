@@ -159,21 +159,21 @@ const schmAccount = new schm({
     },
 
     // Những bài viết mà người dùng được chấp nhận trao đổi 
-    totalAprroved: {
-        type: Number,
-        required: true,
-        default: 0,
-    },
-    approvedItem: {
-        type: [{
-            item: {
-                type: schm.Types.ObjectId,
-                ref: 'Item',
-            },
-            date:  Date,
-        }],
-        required: false,
-    },
+    // totalAprroved: {
+    //     type: Number,
+    //     required: true,
+    //     default: 0,
+    // },
+    // approvedItem: {
+    //     type: [{
+    //         item: {
+    //             type: schm.Types.ObjectId,
+    //             ref: 'Item',
+    //         },
+    //         date:  Date,
+    //     }],
+    //     required: false,
+    // },
 
     // Những món mà người dùng cho vào trong kho quà tặng
     totalStock: {

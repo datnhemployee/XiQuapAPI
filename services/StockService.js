@@ -123,6 +123,64 @@ module.exports = class StockService {
         }
     }
 
+    static async getMyStock (request) {
+        let {
+            token,
+            page,
+        } = request;
+        let session = SessionRepository.findByToken(token);
+
+        if(!session) return {
+            code: Codes.Authorization,
+            content: `Không thể xem vật tặng phẩm đăng khi chưa đăng nhập.`,
+        }
+
+        let {
+            username,
+        } = session;
+
+        let getItemsResult = await UserRepository.getMyStock(username,page);
+        if(getItemsResult.length === 0){
+            return {
+                code: Codes.Exception,
+                content: ` Không còn vật phẩm trong kho. `,
+            }
+        }
+        return {
+            code: Codes.Success,
+            content: getItemsResult.stockList,
+        }
+    }
+
+    static async getMyBought (request) {
+        let {
+            token,
+            page,
+        } = request;
+        let session = SessionRepository.findByToken(token);
+
+        if(!session) return {
+            code: Codes.Authorization,
+            content: `Không thể xem vật tặng phẩm đăng khi chưa đăng nhập.`,
+        }
+
+        let {
+            username,
+        } = session;
+
+        let getItemsResult = await UserRepository.getMyBought(username,page);
+        if(getItemsResult.length === 0){
+            return {
+                code: Codes.Exception,
+                content: ` Không còn vật phẩm trong kho. `,
+            }
+        }
+        return {
+            code: Codes.Success,
+            content: getItemsResult.boughtList,
+        }
+    }
+
     static async getOne (request) {
         let {
             token,
@@ -220,7 +278,7 @@ module.exports = class StockService {
             },
             $push: {
                 boughtList: {
-                    item: _id,
+                    stock: stockFromRepo._id,
                     date: new Date(),
                 }
             },
@@ -336,13 +394,7 @@ module.exports = class StockService {
 
         if (!stockFromRepo.approve) {
             userStockUpdate = {
-                $set: {
-                    point: userFromRepo.point - stockFromRepo.point,
-                    totalStock: userFromRepo.totalStock - 1,
-                },
-                $pull: {
-                    stockList: stockFromRepo._id,
-                }
+                point: userFromRepo.point - stockFromRepo.point,
             }
         }
 

@@ -24,8 +24,8 @@ const UserForRegister = {
     totalWaitting: 0,
     waittingItem: [],
     // Những bài viết mà người dùng được chấp nhận trao đổi 
-    totalAprroved: 0,
-    approvedItem: [],
+    // totalAprroved: 0,
+    // approvedItem: [],
     // Những món mà người dùng cho vào trong kho quà tặng
     totalStock:0,
     stockList: [],

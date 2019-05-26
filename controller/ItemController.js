@@ -14,6 +14,8 @@ class ItemController {
         on_emit(socket,Document.insertItem,ItemController.insert);
         on_emit(socket,Document.getItems,ItemController.getItems);
         on_emit(socket,Document.getItem,ItemController.getItem);
+        on_emit(socket,Document.getMyShop,ItemController.getMyShop);
+        on_emit(socket,Document.getWaitting,ItemController.getWaitting);
         on_emitAll(io,socket,Document.giveLike,ItemController.giveLike);
         on_emitAll(io,socket,Document.exchange,ItemController.exchange);
         on_emitAll(io,socket,Document.approve,ItemController.approve);
@@ -71,6 +73,74 @@ class ItemController {
                 code: Codes.Exception,
             }
         }
+    }
+
+    static async getMyShop (request) {
+        let {
+            token,
+            page,
+        } = request;
+
+        console.log(`pageToGet: ${JSON.stringify(request)}`);
+
+        let constrainst = !token ?
+            `Không tìm thấy token.`:
+            page === 0 ?
+            undefined:
+            !page ?
+            `Không tìm thấy trang ở yêu cầu`:
+            undefined;
+        if(constrainst) {
+            return {
+                code: Codes.Exception,
+                content: constrainst,
+            }
+        }
+        
+        let postsFromService = await ItemService.getMyShop(request);
+        if(postsFromService.code === Codes.Success){
+            return {
+                code: Codes.Success,
+                content: {
+                    list: postsFromService.content,
+                }
+            }
+        }
+        return postsFromService;
+    }
+
+    static async getWaitting (request) {
+        let {
+            token,
+            page,
+        } = request;
+
+        console.log(`pageToGet: ${JSON.stringify(request)}`);
+
+        let constrainst = !token ?
+            `Không tìm thấy token.`:
+            page === 0 ?
+            undefined:
+            !page ?
+            `Không tìm thấy trang ở yêu cầu`:
+            undefined;
+        if(constrainst) {
+            return {
+                code: Codes.Exception,
+                content: constrainst,
+            }
+        }
+        
+        let postsFromService = await ItemService.getWaitting(request);
+        if(postsFromService.code === Codes.Success){
+            return {
+                code: Codes.Success,
+                content: {
+                    list: postsFromService.content,
+                }
+            }
+        }
+        return postsFromService;
     }
 
     static async getItems (request) {

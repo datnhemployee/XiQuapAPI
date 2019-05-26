@@ -86,6 +86,64 @@ module.exports = class ItemService {
         }
     }
 
+    static async getMyShop (pageToGet) {
+        let {
+            token,
+            page,
+        } = pageToGet;
+        let session = SessionRepository.findByToken(token);
+
+        if(!session) return {
+            code: Codes.Authorization,
+            content: `Không thể xem bài đăng khi chưa đăng nhập.`,
+        }
+
+        let {
+            username,
+        } = session;
+
+        let getItemsResult = await UserRepository.getMyShopByPage(username,page);
+        if(!getItemsResult){
+            return {
+                code: Codes.Exception,
+                content: ` Không còn vật phẩm trao đổi. `,
+            }
+        }
+        return {
+            code: Codes.Success,
+            content: getItemsResult.ownedItem,
+        }
+    }
+
+    static async getWaitting (pageToGet) {
+        let {
+            token,
+            page,
+        } = pageToGet;
+        let session = SessionRepository.findByToken(token);
+
+        if(!session) return {
+            code: Codes.Authorization,
+            content: `Không thể xem bài đăng khi chưa đăng nhập.`,
+        }
+
+        let {
+            username,
+        } = session;
+
+        let getItemsResult = await UserRepository.getWaittingItem(username,page);
+        if(!getItemsResult){
+            return {
+                code: Codes.Exception,
+                content: ` Không còn vật phẩm trao đổi. `,
+            }
+        }
+        return {
+            code: Codes.Success,
+            content: getItemsResult.waittingItem,
+        }
+    }
+
     static async get (pageToGet) {
         let {
             token,
@@ -397,7 +455,7 @@ module.exports = class ItemService {
         }
 
         let approvedIndex = itemFromRepo.itemList.findIndex((val)=>val._id===_idAprroved);
-        if (!itemFromRepo) {
+        if (approvedIndex === -1) {
             return {
                 code: Codes.Exception,
                 content: `Không tồn tại vật trao đổi này.`,
@@ -423,29 +481,29 @@ module.exports = class ItemService {
             }
         }
 
-        let userItemUpdate = {
-            $set: {
-                totalAprroved: userFromRepo.totalAprroved + 1,
-            },
-            $push: {
-                approvedItem: {
-                    item: _id,
-                    date: new Date(),
-                },
-            }
-        }
+        // let userItemUpdate = {
+        //     $set: {
+        //         totalAprroved: userFromRepo.totalAprroved + 1,
+        //     },
+        //     $push: {
+        //         approvedItem: {
+        //             item: _id,
+        //             date: new Date(),
+        //         },
+        //     }
+        // }
 
-        try {
-            await UserRepository.updateAsync(
-                userFromRepo._id,
-                userItemUpdate
-            );
-        } catch (userItemException) {
-            return {
-                code: Codes.Error,
-                content: ` Không thể cập nhật người dùng vì ${JSON.stringify(userItemException)}`
-            }
-        }
+        // try {
+        //     await UserRepository.updateAsync(
+        //         userFromRepo._id,
+        //         userItemUpdate
+        //     );
+        // } catch (userItemException) {
+        //     return {
+        //         code: Codes.Error,
+        //         content: ` Không thể cập nhật người dùng vì ${JSON.stringify(userItemException)}`
+        //     }
+        // }
 
         try {
             itemFromRepo = await ItemRepository.findById(_id);

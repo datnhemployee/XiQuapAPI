@@ -6,6 +6,8 @@ module.exports = {
     exchange: 'exchange',
     getItem: 'get-item',
     approve: 'approve',
+    getMyShop: 'get-my-shop',
+    getWaitting: 'get-waitting',
 
     getOption: {
         population: {

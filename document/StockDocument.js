@@ -4,6 +4,8 @@ module.exports = {
     buy: 'buy-stock',
     getOne: 'get-stock',
     approve: 'approve-stock',
+    getMyStock: 'get-my-stock',
+    getMyBought: 'get-bought',
 
     getOption: {
         population: {
