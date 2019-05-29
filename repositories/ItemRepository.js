@@ -47,6 +47,11 @@ module.exports = class ItemRepository {
                         model: 'Account',
                         select: 'name _id totalStar' 
                     })
+                    .populate({
+                        path:  'vendee',
+                        model: 'Account',
+                        select: 'name _id totalStar' 
+                    })
                     .lean();
             },
             default: async function () {
@@ -56,6 +61,11 @@ module.exports = class ItemRepository {
                         path:  'owner',
                         model: 'Account',
                         select: 'name _id totalStar' 
+                    })
+                    .populate({
+                        path:  'vendee',
+                        model: 'Account',
+                        select: 'name _id totalStar avatar' 
                     })
                     .lean();
             }

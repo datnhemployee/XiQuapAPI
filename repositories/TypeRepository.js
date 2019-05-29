@@ -8,6 +8,9 @@ module.exports = class TypeRepository {
         }).lean();
     }
 
+    static async getAll () {
+        return await Type.find({}).lean();
+    }
     
 
 }

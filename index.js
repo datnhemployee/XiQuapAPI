@@ -14,11 +14,12 @@ const AuthController = require('./controller/AuthController');
 const ItemController = require('./controller/ItemController');
 const StockController = require('./controller/StockController');
 const PhotoController = require('./controller/PhotoController');
+const TypeController = require('./controller/TypeController');
 
-const seed = require('./Seed');
+// const seed = require('./Seed');
 
 async function main () {
-    await seed.seed();
+    // await seed.seed();
 }
 
 PhotoController.start(app);
@@ -34,5 +35,6 @@ main()
             AuthController.start(io,socket);
             ItemController.start(io,socket);
             StockController.start(io,socket);
+            TypeController.start(io,socket);
         });
     });

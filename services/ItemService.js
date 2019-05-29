@@ -195,6 +195,7 @@ module.exports = class ItemService {
         }
     }
 
+
     static async giveLike (input) {
         let {
             _id,
@@ -422,7 +423,7 @@ module.exports = class ItemService {
         let {
             token,
             _id,
-            _idAprroved,
+            _idApproved,
         } = request;
 
         let session = SessionRepository.findByToken(token);
@@ -454,7 +455,14 @@ module.exports = class ItemService {
             }
         }
 
-        let approvedIndex = itemFromRepo.itemList.findIndex((val)=>val._id===_idAprroved);
+        if (!!itemFromRepo.vendee) {
+            return {
+                code: Codes.Exception,
+                content: `Đã chấp nhận trao đổi, không sửa dưới quyền người dùng.`,
+            }
+        }
+
+        let approvedIndex = itemFromRepo.itemList.findIndex((val)=>val._id.toString()==_idApproved.toString());
         if (approvedIndex === -1) {
             return {
                 code: Codes.Exception,
@@ -470,7 +478,7 @@ module.exports = class ItemService {
 
         try {
             await ItemRepository.updateAsync(
-                _id,
+                itemFromRepo._id,
                 itemUpdate
             );
 
