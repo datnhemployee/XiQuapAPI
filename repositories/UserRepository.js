@@ -23,12 +23,13 @@ module.exports = class UserRepository{
         return await UserManager
         .findOne({username:username})
         .select(`-like -waittingItem -followers -ownedItem -stockList -boughtList -chats`)
+        .lean();
     }
 
     static async getMyShopByPage (username, page) {
         return await UserManager
             .findOne({username:username})
-            .select(`ownedItem`)
+            .select(`ownedItem _id like`)
             .populate({
                 path:  'ownedItem',
                 model: 'Item',
@@ -41,13 +42,14 @@ module.exports = class UserRepository{
             })
             .sort({_id: -1})
             .skip(page * 5)
-            .limit(5);
+            .limit(5)
+            .lean();
     }
 
     static async getWaittingItem (username, page) {
         return await UserManager
             .findOne({username:username})
-            .select(`waittingItem`)
+            .select(`waittingItem _id like`)
             .populate({
                 path:  'waittingItem.item',
                 model: 'Item',
@@ -60,7 +62,8 @@ module.exports = class UserRepository{
             })
             .sort({_id: -1})
             .skip(page * 5)
-            .limit(5);
+            .limit(5)
+            .lean();
     }
 
     static async getMyStock (username, page) {
@@ -73,20 +76,22 @@ module.exports = class UserRepository{
             })
             .sort({_id: -1})
             .skip(page * 6)
-            .limit(6);
+            .limit(6)
+            .lean();
     }
 
     static async getMyBought (username, page) {
         return await UserManager
             .findOne({username:username})
-            .select(`boughtList`)
+            .select(`boughtList.stock`)
             .populate({
                 path:  'boughtList.stock',
                 model: 'Stock',
             })
             .sort({_id: -1})
             .skip(page * 6)
-            .limit(6);
+            .limit(6)
+            .lean();
     }
 
 }

@@ -109,6 +109,12 @@ module.exports = class ItemService {
                 content: ` Không còn vật phẩm trao đổi. `,
             }
         }
+        getItemsResult.ownedItem = getItemsResult.ownedItem.map((val)=>{
+            return {
+                ...val,
+                isLike: getItemsResult.like.findIndex((likeEle) => likeEle.toString() == val._id) != -1,
+            }
+        })
         return {
             code: Codes.Success,
             content: getItemsResult.ownedItem,
@@ -138,6 +144,12 @@ module.exports = class ItemService {
                 content: ` Không còn vật phẩm trao đổi. `,
             }
         }
+        getItemsResult.waittingItem = getItemsResult.waittingItem.map((val)=>{
+            return {
+                ...val.item,
+                isLike: getItemsResult.like.findIndex((likeEle) => likeEle.toString() == val.item._id) != -1,
+            }
+        })
         return {
             code: Codes.Success,
             content: getItemsResult.waittingItem,
@@ -156,6 +168,13 @@ module.exports = class ItemService {
             content: `Không thể xem bài đăng khi chưa đăng nhập.`,
         }
 
+        let userFromDB = await AuthRepository.hasUsername(session.username);
+
+        if(!userFromDB) return {
+            code: Codes.Authorization,
+            content: `Không tồn tại người dùng này.`,
+        }
+
         let getItemsResult = await ItemRepository.getByPage(page);
         if(getItemsResult.length === 0){
             return {
@@ -163,6 +182,12 @@ module.exports = class ItemService {
                 content: ` Không còn vật phẩm trao đổi. `,
             }
         }
+        getItemsResult = getItemsResult.map((val) => {
+            return {
+                ...val,
+                isLike: val.likeList.findIndex((val) => val.toString() == userFromDB._id.toString()) != -1,
+            }
+        })
         return {
             code: Codes.Success,
             content: getItemsResult,
@@ -182,12 +207,32 @@ module.exports = class ItemService {
             content: `Không thể xem bài đăng khi chưa đăng nhập.`,
         }
 
+        let {
+            username,
+        } = session;
+
+        let userFromRepo = await AuthRepository.hasUsername(username);
+        
+        if (!userFromRepo) {
+            return {
+                code: Codes.Exception,
+                content: `Không tồn tại người dùng này.`,
+            }
+        }
+
         let getItemsResult = await ItemRepository.findById(_id,option);
         if(!getItemsResult){
             return {
                 code: Codes.Exception,
                 content: ` Không tìm thấy bài viết tương ứng. `,
             }
+        }
+
+        getItemsResult = {
+            ...getItemsResult,
+            isLike: getItemsResult.likeList.findIndex((val) => {
+                
+                return val.toString() == userFromRepo._id.toString()}) != -1,
         }
         return {
             code: Codes.Success,
@@ -236,6 +281,8 @@ module.exports = class ItemService {
 
             return val.toString() == userFromRepo._id.toString()
         });
+
+        let isLike = true;
         
         let itemUpdate = {
             $set: {
@@ -262,6 +309,8 @@ module.exports = class ItemService {
                     likeList:  userFromRepo._id,
                 }
             }
+
+            isLike = false;
 
             userItemUpdate = {
                 $pull: {
@@ -303,7 +352,10 @@ module.exports = class ItemService {
         
             return {
                 code: Codes.Success,
-                content: itemFromRepo
+                content: {
+                    ...itemFromRepo,
+                    isLike,
+                }
             }
         } catch (finalResultException) {
             return {

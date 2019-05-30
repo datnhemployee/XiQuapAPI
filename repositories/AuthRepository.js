@@ -107,7 +107,7 @@ module.exports = class AuthRepository {
         
         if(hasEmail) return {
             code: Codes.Exception,
-            content: 'Tên tài khoản đã tồn tại hoặc email đã tồn tại.'
+            content: 'Đang kiểm duyệt.'
         }
 
         let user = await AuthRepository.hasUsername(username);
@@ -115,7 +115,7 @@ module.exports = class AuthRepository {
 
         if(!!user) return {
             code: Codes.Exception,
-            content: 'Tên tài khoản đã tồn tại hoặc email đã tồn tại.'
+            content: 'Đang kiểm duyệt.'
         }
 
         userForRegister.salt = getRandomString(20);
@@ -128,7 +128,14 @@ module.exports = class AuthRepository {
 
 
         const UserToDB = new Account(userForRegister);
-        await UserToDB.save();
+        try {
+            await UserToDB.save();
+        } catch (err) {
+            return {
+                code: Codes.Exception,
+                content: 'Đang kiểm duyệt.'
+            }
+        }
         console.log(`UserToDB ${JSON.stringify(UserToDB)}`)
 
 

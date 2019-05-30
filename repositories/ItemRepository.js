@@ -23,7 +23,8 @@ module.exports = class ItemRepository {
             })
             .sort({_id: -1})
             .skip(page * 5)
-            .limit(5);
+            .limit(5)
+            .lean();
     }
 
     static get getOption () {
@@ -40,17 +41,17 @@ module.exports = class ItemRepository {
                     .populate({
                         path:  'itemList.vendee',
                         model: 'Account',
-                        select: 'name _id totalStar' 
+                        select: 'name _id totalStar avatar' 
                     })
                     .populate({
                         path:  'owner',
                         model: 'Account',
-                        select: 'name _id totalStar' 
+                        select: 'name _id totalStar avatar' 
                     })
                     .populate({
                         path:  'vendee',
                         model: 'Account',
-                        select: 'name _id totalStar' 
+                        select: 'name _id totalStar avatar' 
                     })
                     .lean();
             },
@@ -60,7 +61,7 @@ module.exports = class ItemRepository {
                     .populate({
                         path:  'owner',
                         model: 'Account',
-                        select: 'name _id totalStar' 
+                        select: 'name _id totalStar avatar' 
                     })
                     .populate({
                         path:  'vendee',

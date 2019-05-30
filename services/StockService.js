@@ -175,6 +175,7 @@ module.exports = class StockService {
                 content: ` Không còn vật phẩm trong kho. `,
             }
         }
+        getItemsResult.boughtList = getItemsResult.boughtList.map((val) => val.stock);
         return {
             code: Codes.Success,
             content: getItemsResult.boughtList,
@@ -252,6 +253,7 @@ module.exports = class StockService {
             code: Codes.Exception,
             content: ` Phần quà đã bị đổi.`,
         }
+
         let stockUpdate = {
             $set: {
                 vendee: userFromRepo._id,
