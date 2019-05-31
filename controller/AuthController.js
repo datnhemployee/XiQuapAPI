@@ -17,6 +17,7 @@ class AuthController {
         on_emit(socket,Document.LogIn,AuthController.logIn);
         on_emit(socket,Document.Disconnect,AuthController.disconnect);
         on_emit(socket,Document.GetInfo,AuthController.getInfo);
+        on_emit(socket,Document.getOther,AuthController.getOther);
         // listen(socket,Document.LogOut,AuthController.logOut);
         // listen(socket,Document.TokenLogIn,AuthController.tokenLogIn);
     }
@@ -166,6 +167,34 @@ class AuthController {
         if (!error) {
             try {
                 return await AuthService.getInfo(request);
+            } catch (responseError) {
+                return {
+                    code: Codes.Error,
+                    content: ` Không thể lấy thông tin cá nhân vì ${responseError}`,
+                }
+            }
+        }
+        return {
+            code: Codes.Exception,
+            content: error,
+        }
+    }
+
+    static async getOther (request) {
+        let {
+            token,
+            _id
+        } = request;
+
+        const error = !token?
+            ` Dữ liệu đính kèm không chính xác.`:
+            !_id?
+            ` Dữ liệu đính kèm không chính xác.`
+            :undefined;
+
+        if (!error) {
+            try {
+                return await AuthService.getOther(request);
             } catch (responseError) {
                 return {
                     code: Codes.Error,

@@ -6,8 +6,8 @@ const app = express();
 const server = require('http').Server(app);
 var io = require('socket.io')(server);
 
-// const port =  4000;
-const port = process.env.PORT || 4000;
+const port =  4000;
+// const port = process.env.PORT || 4000;
 server.listen(port);
 
 const AuthController = require('./controller/AuthController');

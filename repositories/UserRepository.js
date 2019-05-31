@@ -7,7 +7,10 @@ module.exports = class UserRepository{
     }
 
     static async getByID (id) {
-        return await UserManager.findById(id).lean();
+        return await UserManager
+        .findById(id)
+        .select(`-like -waittingItem -followers -ownedItem -stockList -boughtList -chats`)
+        .lean();
     }
 
     static async updateAsync (id,userForUpdate) {

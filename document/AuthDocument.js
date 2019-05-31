@@ -5,4 +5,5 @@ module.exports = {
     TokenLogIn: 'token-log-in',
     Disconnect: 'disconnect',
     GetInfo: 'get-info',
+    getOther: 'get-other',
 }

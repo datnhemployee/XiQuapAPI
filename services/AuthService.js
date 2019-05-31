@@ -185,4 +185,34 @@ module.exports = class AuthService {
 
     }
 
+    static async getOther (request) {
+
+        let {
+            token,
+            _id,
+        } = request;
+
+        let session = SessionRepository.findByToken(token);
+
+        if(!session) return {
+            code: Codes.Authorization,
+            content: `Không thể lấy thông tin cá nhân khi chưa đăng nhập.`,
+        }
+
+        let userFromRepo = await UserRepository.getByID(_id);
+        
+        if (!userFromRepo) {
+            return {
+                code: Codes.Exception,
+                content: `Không tồn tại người dùng này.`,
+            }
+        }
+
+        return {
+            code: Codes.Success,
+            content: userFromRepo,
+        }
+
+    }
+
 }
